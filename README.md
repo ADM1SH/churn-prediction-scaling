@@ -1,5 +1,10 @@
 # Player Churn Prediction & Dynamic Scaling
 
+[![C++ / Python / XGBoost](https://img.shields.io/ML-XGBoost_%7C_C%2B%2B_Telemetry-orange.svg)](https://github.com/ADM1SH/churn-prediction-scaling)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![GitHub Issues](https://img.shields.io/github/issues/ADM1SH/churn-prediction-scaling)](https://github.com/ADM1SH/churn-prediction-scaling/issues)
+
+
 A minimal but real pipeline: a C++ TCP server ingests player telemetry, an
 XGBoost model predicts churn probability from the aggregated session
 features, and a scorer fires a webhook with a suggested action for
@@ -7,19 +12,19 @@ players about to quit.
 
 ## What it does
 
-1. **C++ telemetry server** (`server/telemetry_server.cpp`) — plain POSIX-socket
+1. **C++ telemetry server** (`server/telemetry_server.cpp`) : plain POSIX-socket
    TCP server. Accepts newline-delimited JSON events per connection
    (`session_start`, `movement`, `death`, `menu_open`, `menu_close`,
    `session_end`), aggregates them in memory per session (deaths, movement
    count, menu-idle time, session duration, time since last death), and
    appends one CSV feature row per session on `session_end` (or on
    disconnect, if the client drops mid-session).
-2. **Event-generator client** (`client/generator.py`) — simulates 6 players
+2. **Event-generator client** (`client/generator.py`) : simulates 6 players
    over real sockets: 3 "at-risk" players whose sessions get shorter, whose
    menu-idle time rises, and whose deaths cluster right before they quit
    across 4 sequential sessions; 3 "healthy" players with stable session
    length, low menu time, and few well-spread deaths.
-3. **Churn model + webhook trigger** (`ml/`) — trains an XGBoost classifier
+3. **Churn model + webhook trigger** (`ml/`) : trains an XGBoost classifier
    on a larger synthetic labeled batch (same feature schema as the live
    log), reports held-out accuracy/AUC, then scores rows from the real
    telemetry log and POSTs a webhook (`webhook/receiver.py`, a local
@@ -120,3 +125,36 @@ two real webhook calls:
   just logs payloads on localhost. Add when: a live game backend exposes an
   authenticated endpoint to actually apply `lower_difficulty` /
   `grant_reward` to a player's session.
+
+## Support
+Submit issues, questions, or bug reports to the GitHub issue tracker:
+https://github.com/ADM1SH/churn-prediction-scaling/issues
+
+
+## Roadmap
+* [x] Core architecture and baseline implementation.
+* [x] Functional verification and test coverage.
+* [ ] Add real-time feature store integration
+* [ ] Implement automated retraining pipeline on drift detection
+
+
+## Contributing
+Contributions are welcome.
+1. Fork the repository.
+2. Create a feature branch: `git checkout -b feature/improvement`.
+3. Commit your changes: `git commit -m "feat: enhance functionality"`.
+4. Push to the branch: `git push origin feature/improvement`.
+5. Open a Pull Request.
+
+
+## Authors and Acknowledgment
+* **Adam Anwar** (ADM1SH) - Lead architect and developer.
+* Architected by Adam Anwar for player retention analytics in gaming.
+
+
+## License
+Licensed under the MIT License. See `LICENSE` for details.
+
+
+## Project Status
+Operational telemetry and predictive ML service.
